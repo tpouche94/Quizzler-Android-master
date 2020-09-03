@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -54,11 +55,36 @@ public class MainActivity extends Activity {
     final int PROGRESS_BAR_INCREMENT = (int) Math.ceil(100.0 / mQuestionBank.length);
 
 
-
+    //when the app get lunched from the home screen, the value
+    //of savedInstanceState will be null
+    //when the app has been running the value of
+    // savedInstanceState will not be null
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
+
+        //if the app has been running, and it restarts restart due to screen
+        //rotation, the value of savedInstanceState will not be null
+        //and so we want so save the score value and the question we're on
+
+        if(savedInstanceState!=null)
+        {
+            score = savedInstanceState.getInt("ScoreKey");
+            mQuestion = savedInstanceState.getInt("questionKey");
+        }
+
+        //if the app was not running before, then leave the score, and the question at zero
+        else
+        {
+            score = 0;
+            mQuestion = 0;
+        }
+
+
 
         true_Button = (Button) findViewById(R.id.true_button);
 
@@ -69,6 +95,9 @@ public class MainActivity extends Activity {
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+
+        //show saved score if screen rotate
+        score_text.setText("Score " +score +"/" +mQuestionBank.length);
 
 
 
@@ -140,5 +169,24 @@ public class MainActivity extends Activity {
         {
             Toast.makeText(getApplicationContext(), R.string.incorrect_toast, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+
+    /*this block  will allow us to save the state of our app
+    when it restarts due to screen rotation
+     */
+
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+
+        //Save the score and the question the user was on
+        //we use putInt, because the info being saved are integers
+        //putInt takes a Map, with a string as the key and value is the info being passed
+        //this block of code will tell the app to check the
+        //bundle when it is being created
+        outState.putInt("ScoreKey", score);
+        outState.putInt("questionKey", mQuestion);
+
     }
 }
